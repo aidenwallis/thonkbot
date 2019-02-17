@@ -2,5 +2,7 @@
     "twitchUsername": "thonkangbot",
     "twitchPassword": "",
     "mysqlDsn": "root:secret@/thonkbot?parseTime=true&charset=utf8mb4",
-    "webhost": ":1337"
+    "webhost": ":1337",
+    "twitchrelay": "irc.chat.twitch.tv:6697",
+    "useTLS": true
 }

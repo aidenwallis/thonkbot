@@ -10,6 +10,8 @@ type Config struct {
 	TwitchPassword string `json:"twitchPassword"`
 	MysqlDSN       string `json:"mysqlDsn"`
 	Webhost        string `json:"webhost"`
+	Twitchrelay    string `json:"twitchrelay"`
+	UseTLS         bool   `json:"useTLS"`
 }
 
 var Cfg *Config

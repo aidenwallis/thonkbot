@@ -33,8 +33,10 @@ func New(logger logrus.FieldLogger, newbotFunc newbotFunc) *BotManager {
 	return m
 }
 
-func (m *BotManager) Connect(username string, password string) {
+func (m *BotManager) Connect(username string, password string, ircAddr string, useTLS bool) {
 	client := twitch.NewClient(username, password)
+	client.IrcAddress = ircAddr
+	client.TLS = useTLS
 	client.OnNewMessage(func(channel string, user twitch.User, message twitch.Message) {
 		msg := &common.Message{
 			ChannelName: channel,

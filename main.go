@@ -26,7 +26,7 @@ func main() {
 	}
 
 	manager := botmanager.New(logger, singlebot.New)
-	manager.Connect(config.Cfg.TwitchUsername, config.Cfg.TwitchPassword)
+	manager.Connect(config.Cfg.TwitchUsername, config.Cfg.TwitchPassword, config.Cfg.Twitchrelay, config.Cfg.UseTLS)
 	err = manager.JoinChannels()
 	if err != nil {
 		logger.WithError(err).Error("Failed to fetch channels")
