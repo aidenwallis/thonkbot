@@ -56,7 +56,7 @@ func (m *BasicCommands) randomQuote(msg *common.Message) {
 			target = target[1:]
 		}
 	}
-	quote, err := mysql.FetchRandomQuote(msg.ChannelName, target)
+	quote, err := mysql.FetchRandomQuote(target, msg.ChannelName)
 	if err != nil {
 		m.bot.Log().WithError(err).Error("Failed to get random quote")
 		m.bot.Sayf("@%s, Failed to get quote for user %s", msg.User.Username, target)
