@@ -1,0 +1,5 @@
+{
+    "twitchUsername": "thonkangbot",
+    "twitchPassword": "",
+    "mysqlDsn": "root:secret@/thonkbot?parseTime=true"
+}
