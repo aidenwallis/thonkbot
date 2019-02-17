@@ -9,6 +9,7 @@ type Config struct {
 	TwitchUsername string `json:"twitchUsername"`
 	TwitchPassword string `json:"twitchPassword"`
 	MysqlDSN       string `json:"mysqlDsn"`
+	Webhost        string `json:"webhost"`
 }
 
 var Cfg *Config

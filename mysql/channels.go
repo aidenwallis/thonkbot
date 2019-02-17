@@ -90,3 +90,83 @@ func DeleteChannel(id int, name string) error {
 	_, err = stmt.Exec(name)
 	return err
 }
+
+func GetUserLogs(channel string, username string, limit int) ([]common.Quote, error) {
+	quotes := []common.Quote{}
+	stmt, err := db.Prepare("SELECT username, message, created_at FROM messages WHERE channel_name = ? AND username = ? ORDER BY created_at DESC LIMIT ?")
+	if err != nil {
+		return quotes, err
+	}
+
+	rows, err := stmt.Query(channel, username, limit)
+	if err != nil {
+		return quotes, err
+	}
+
+	for rows.Next() {
+		quote := common.Quote{}
+		err = rows.Scan(&quote.Username, &quote.Message, &quote.CreatedAt)
+		if err != nil {
+			continue
+		}
+		quotes = append([]common.Quote{quote}, quotes...)
+	}
+
+	return quotes, err
+}
+
+func GetAllLogs(channel string) ([]common.Quote, error) {
+	quotes := []common.Quote{}
+	stmt, err := db.Prepare("SELECT username, message, created_at FROM messages WHERE channel_name = ?")
+	if err != nil {
+		return quotes, err
+	}
+
+	rows, err := stmt.Query(channel)
+	if err != nil {
+		return quotes, err
+	}
+
+	for rows.Next() {
+		quote := common.Quote{}
+		err = rows.Scan(&quote.Username, &quote.Message, &quote.CreatedAt)
+		if err != nil {
+			continue
+		}
+		quotes = append([]common.Quote{quote}, quotes...)
+	}
+
+	return quotes, err
+}
+
+func LogSearch(channel string, query string, mins int) ([]common.Quote, error) {
+	quotes := []common.Quote{}
+	stmt, err := db.Prepare(`
+		SELECT username, message, created_at FROM messages WHERE channel_name = ? AND
+		(created_at >= CURRENT_TIMESTAMP - INTERVAL ? MINUTE) AND (message LIKE ?)
+	`)
+	if err != nil {
+		return quotes, err
+	}
+
+	nameMap := map[string]bool{}
+	rows, err := stmt.Query(channel, mins, "%"+query+"%")
+	if err != nil {
+		return quotes, err
+	}
+
+	for rows.Next() {
+		quote := common.Quote{}
+		err = rows.Scan(&quote.Username, &quote.Message, &quote.CreatedAt)
+		if err != nil {
+			continue
+		}
+		_, isKnown := nameMap[quote.Username]
+		if !isKnown {
+			nameMap[quote.Username] = true
+			quotes = append(quotes, quote)
+		}
+	}
+
+	return quotes, err
+}

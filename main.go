@@ -9,6 +9,7 @@ import (
 	"github.com/aidenwallis/thonkbot/botmanager"
 	"github.com/aidenwallis/thonkbot/config"
 	"github.com/aidenwallis/thonkbot/mysql"
+	"github.com/aidenwallis/thonkbot/web"
 	"github.com/sirupsen/logrus"
 )
 
@@ -31,6 +32,9 @@ func main() {
 		logger.WithError(err).Error("Failed to fetch channels")
 		os.Exit(1)
 	}
+
+	w := web.New(config.Cfg.Webhost, manager, logger)
+	go w.Start()
 
 	logrus.Info("Bot is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)

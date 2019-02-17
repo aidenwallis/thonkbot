@@ -1,5 +1,6 @@
 {
     "twitchUsername": "thonkangbot",
     "twitchPassword": "",
-    "mysqlDsn": "root:secret@/thonkbot?parseTime=true"
+    "mysqlDsn": "root:secret@/thonkbot?parseTime=true&charset=utf8mb4",
+    "webhost": ":1337"
 }

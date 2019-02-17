@@ -19,5 +19,4 @@ func (m *LogMessage) Run(msg *common.Message) {
 	if err != nil {
 		m.bot.Log().WithError(err).Error("Failed to log message")
 	}
-	m.bot.Log().Debug("Logged message!")
 }
