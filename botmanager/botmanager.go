@@ -37,6 +37,7 @@ func (m *BotManager) Connect(username string, password string, ircAddr string, u
 	client := twitch.NewClient(username, password)
 	client.IrcAddress = ircAddr
 	client.TLS = useTLS
+	client.SetupCmd = "LOGIN thonkbot"
 	client.OnNewMessage(func(channel string, user twitch.User, message twitch.Message) {
 		msg := &common.Message{
 			ChannelName: channel,

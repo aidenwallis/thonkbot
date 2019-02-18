@@ -2,7 +2,9 @@ package mysql
 
 import (
 	"database/sql"
+	"math/rand"
 	"strings"
+	"time"
 
 	"github.com/aidenwallis/thonkbot/common"
 	_ "github.com/go-sql-driver/mysql"
@@ -26,25 +28,30 @@ func Close() {
 }
 
 func FetchRandomQuote(username string, channel string) (*common.Quote, error) {
-	stmt, err := db.Prepare(`
-		SELECT username, message, created_at
-			FROM messages AS r1 JOIN
-				(SELECT CEIL(RAND() * (SELECT MAX(id) FROM messages WHERE username = ? AND channel_name = ?)) AS id) AS r2
-			WHERE r1.id >= r2.id AND username = ? AND channel_name = ?
-			ORDER BY r1.id ASC
-		LIMIT 1
-	`)
+	stmt, err := db.Prepare(`SELECT COUNT(id) FROM messages WHERE username = ? AND channel_name = ?`)
 	if err != nil {
 		return nil, err
 	}
 	quote := common.Quote{}
-	row := stmt.QueryRow(username, channel, username, channel)
-	err = row.Scan(&quote.Username, &quote.Message, &quote.CreatedAt)
-	if err == sql.ErrNoRows {
+	var msgCount int
+	row := stmt.QueryRow(username, channel)
+	err = row.Scan(&msgCount)
+	if err == sql.ErrNoRows || msgCount == 0 {
 		return nil, nil
 	} else if err != nil {
 		return nil, err
 	}
+
+	rand.Seed(time.Now().Unix())
+	offset := rand.Int() % msgCount
+
+	stmt, err = db.Prepare(`SELECT username, message, created_at FROM messages WHERE username = ? AND channel_name = ? LIMIT 1 OFFSET ?`)
+	if err != nil {
+		return nil, err
+	}
+
+	row = stmt.QueryRow(username, channel, offset)
+	err = row.Scan(&quote.Username, &quote.Message, &quote.CreatedAt)
 	return &quote, err
 }
 
