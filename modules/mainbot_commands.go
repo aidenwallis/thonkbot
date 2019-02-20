@@ -48,7 +48,7 @@ func (m *MainBotCommands) registerCommand(aliases []string, cb commandFunc) {
 
 func (m *MainBotCommands) joinCommand(msg *common.Message) {
 	toJoin := msg.User.Username
-	if len(msg.Split) < 1 {
+	if len(msg.Split) > 1 {
 		toJoin = msg.Split[1]
 	}
 
