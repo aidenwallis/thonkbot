@@ -19,4 +19,12 @@ func (m *LogMessage) Run(msg *common.Message) {
 	if err != nil {
 		m.bot.Log().WithError(err).Error("Failed to log message")
 	}
+	err = mysql.UpdateUsersTable(msg.User.Username, msg.ChannelName, msg.Message.Text)
+	if err != nil {
+		m.bot.Log().WithError(err).Error("Failed to update user")
+	}
+	err = mysql.IncrementChannel(msg.ChannelName)
+	if err != nil {
+		m.bot.Log().WithError(err).Error("Failed to increment channel")
+	}
 }

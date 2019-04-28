@@ -170,3 +170,25 @@ func LogSearch(channel string, query string, mins int) ([]common.Quote, error) {
 
 	return quotes, err
 }
+
+func UpdateUsersTable(username string, channel string, msg string) error {
+	stmt, err := db.Prepare(`
+		INSERT INTO users (username, channel, first_message, last_message)
+		VALUES (?, ?, ?, ?)
+		ON DUPLICATE KEY UPDATE message_count = message_count + 1, last_message = ?
+	`)
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(username, channel, msg, msg, msg)
+	return err
+}
+
+func IncrementChannel(channel string) error {
+	stmt, err := db.Prepare(`UPDATE channels SET message_count = message_count + 1 WHERE name = ?`)
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(channel)
+	return err
+}
