@@ -172,15 +172,16 @@ func LogSearch(channel string, query string, mins int) ([]common.Quote, error) {
 }
 
 func UpdateUsersTable(username string, channel string, msg string) error {
+	discriminator := username + "::_::" + channel
 	stmt, err := db.Prepare(`
-		INSERT INTO users (username, channel, first_message, last_message)
-		VALUES (?, ?, ?, ?)
+		INSERT INTO users (username, channel, discriminator, first_message, last_message)
+		VALUES (?, ?, ?, ?, ?)
 		ON DUPLICATE KEY UPDATE message_count = message_count + 1, last_message = ?
 	`)
 	if err != nil {
 		return err
 	}
-	_, err = stmt.Exec(username, channel, msg, msg, msg)
+	_, err = stmt.Exec(username, channel, discriminator, msg, msg, msg)
 	return err
 }
 
