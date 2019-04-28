@@ -27,14 +27,29 @@ func Close() {
 	}
 }
 
+func FetchLineCount(username, channel string) (int, error) {
+	discriminator := username + "::_::" + channel
+	stmt, err := db.Prepare("SELECT message_count FROM users WHERE discriminator = ? LIMIT 1")
+	if err != nil {
+		return 0, err
+	}
+	msgCount := 0
+	row := stmt.QueryRow(discriminator)
+	err = row.Scan(&msgCount)
+	if err == sql.ErrNoRows {
+		return msgCount, nil
+	}
+	return msgCount, err
+}
+
 func FetchRandomQuote(username string, channel string) (*common.Quote, error) {
-	stmt, err := db.Prepare(`SELECT COUNT(id) FROM messages WHERE username = ? AND channel_name = ?`)
+	discriminator := username + "::_::" + channel
+	stmt, err := db.Prepare("SELECT message_count FROM users WHERE discriminator = ? LIMIT 1")
 	if err != nil {
 		return nil, err
 	}
-	quote := common.Quote{}
-	var msgCount int
-	row := stmt.QueryRow(username, channel)
+	msgCount := 0
+	row := stmt.QueryRow(discriminator)
 	err = row.Scan(&msgCount)
 	if err == sql.ErrNoRows || msgCount == 0 {
 		return nil, nil
@@ -42,6 +57,7 @@ func FetchRandomQuote(username string, channel string) (*common.Quote, error) {
 		return nil, err
 	}
 
+	quote := common.Quote{}
 	rand.Seed(time.Now().Unix())
 	offset := rand.Int() % msgCount
 
