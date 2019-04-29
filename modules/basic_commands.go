@@ -82,7 +82,7 @@ func (m *BasicCommands) linecount(msg *common.Message) {
 		m.bot.Sayf("@%s, Failed to get line count for user %s!", msg.User.Username, target)
 	}
 
-	m.bot.Sayf("@%s, User %s has sent %s lines in chat so far.", msg.User.Username, count)
+	m.bot.Sayf("@%s, User %s has sent %d lines in chat so far.", msg.User.Username, target, count)
 }
 
 func (m *BasicCommands) scanCommand(msg *common.Message) {
