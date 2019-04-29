@@ -21,6 +21,8 @@ func (m *BasicCommands) Init(bot bot.Bot) {
 	m.registerCommand([]string{"rq"}, m.randomQuote)
 	m.registerCommand([]string{"scan"}, m.scanCommand)
 	m.registerCommand([]string{"globalscan"}, m.globalscanCommand)
+	// m.registerCommand([]string{"firstmsg"}, m.firstmsg)
+	m.registerCommand([]string{"linecount"}, m.linecount)
 }
 
 func (m *BasicCommands) Run(msg *common.Message) {
@@ -51,10 +53,7 @@ func (m *BasicCommands) registerCommand(aliases []string, cb commandFunc) {
 func (m *BasicCommands) randomQuote(msg *common.Message) {
 	target := msg.User.Username
 	if len(msg.Split) >= 2 && len(msg.Split[1]) > 1 {
-		target = strings.ToLower(msg.Split[1])
-		if target[0] == '@' {
-			target = target[1:]
-		}
+		target = strings.TrimPrefix(strings.ToLower(msg.Split[1]), "@")
 	}
 	quote, err := mysql.FetchRandomQuote(target, msg.ChannelName)
 	if err != nil {
@@ -70,6 +69,20 @@ func (m *BasicCommands) randomQuote(msg *common.Message) {
 
 	formattedDate := quote.CreatedAt.UTC().Format(time.ANSIC)
 	m.bot.Sayf("[%s] %s: %s", formattedDate, quote.Username, quote.Message)
+}
+
+func (m *BasicCommands) linecount(msg *common.Message) {
+	target := msg.User.Username
+	if len(msg.Split) >= 2 && len(msg.Split[1]) > 1 {
+		target = strings.TrimPrefix(strings.ToLower(msg.Split[1]), "@")
+	}
+	count, err := mysql.FetchLineCount(target, msg.ChannelName)
+	if err != nil {
+		m.bot.Log().WithError(err).Error("Failed to fetch line count")
+		m.bot.Sayf("@%s, Failed to get line count for user %s!", msg.User.Username, target)
+	}
+
+	m.bot.Sayf("@%s, User %s has sent %s lines in chat so far.", msg.User.Username, count)
 }
 
 func (m *BasicCommands) scanCommand(msg *common.Message) {
