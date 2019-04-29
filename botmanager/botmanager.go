@@ -1,6 +1,7 @@
 package botmanager
 
 import (
+	"regexp"
 	"strings"
 	"sync"
 
@@ -23,6 +24,8 @@ type BotManager struct {
 
 type newbotFunc func(common.Channel, logrus.FieldLogger, *twitch.Client, *BotManager) bot.Bot
 
+var replaceRe = regexp.MustCompile(`[\x{E0000}\s\x{180e}\x{feff}\x{2000}-\x{200d}\x{206D}]+`)
+
 func New(logger logrus.FieldLogger, newbotFunc newbotFunc) *BotManager {
 	m := &BotManager{
 		newbotFunc:     newbotFunc,
@@ -43,7 +46,7 @@ func (m *BotManager) Connect(username string, password string, ircAddr string, u
 			ChannelName: channel,
 			User:        user,
 			Message:     message,
-			Split:       strings.Split(message.Text, " "),
+			Split:       strings.Split(strings.TrimSpace(replaceRe.ReplaceAllString(message.Text, " ")), " "),
 		}
 		m.handleMessage(msg)
 	})
